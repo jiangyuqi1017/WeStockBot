@@ -62,6 +62,21 @@ def get_market_analysis():
             summary_lines.append(f"• **{name}**: {pct} (主力 {flow_val:+.1f}亿)")
         summary_lines.append("")
 
+        # === 分析 1.5: 领涨板块 Top3 个股 ===
+        try:
+            lead_sector = top_ind.iloc[0][name_col]
+            df_stocks = ak.stock_sector_fund_flow_stock(sector=lead_sector, indicator="今日")
+            s_name_col = next((x for x in df_stocks.columns if "名称" in x), "名称")
+            s_pct_col  = next((x for x in df_stocks.columns if "涨跌幅" in x), "今日涨跌幅")
+            df_stocks['_s'] = df_stocks[s_pct_col].astype(str).str.replace('%', '').astype(float)
+            top3 = df_stocks.sort_values(by='_s', ascending=False).head(3)
+            summary_lines.append(f"📊 **{lead_sector} Top3 个股**:")
+            for _, row in top3.iterrows():
+                summary_lines.append(f"• {row[s_name_col]}: {row[s_pct_col]}")
+            summary_lines.append("")
+        except Exception:
+            pass
+
         # === 分析 2: 热门概念 ===
         df_con['sort_pct'] = df_con[pct_col].astype(str).str.replace('%','').astype(float)
         top_con = df_con.sort_values(by='sort_pct', ascending=False).head(3)

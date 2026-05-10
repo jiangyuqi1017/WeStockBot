@@ -4,7 +4,7 @@ on:
   schedule:
     # 北京时间 07:30 = UTC 23:30 （有延迟）
     # 每天（周一到周日）都运行
-    - cron: '30 23 * * *'
+    - cron: '30 23 * * 0-4'
   workflow_dispatch: # 允许手动测试
 
 jobs:
@@ -12,10 +12,10 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
-        uses: actions/checkout@v2
+        uses: actions/checkout@v4
 
       - name: Set up Python
-        uses: actions/setup-python@v2
+        uses: actions/setup-python@v4
         with:
           python-version: '3.9'
 

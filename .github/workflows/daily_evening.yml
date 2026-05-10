@@ -3,7 +3,7 @@ name: Evening A-Share Push
 on:
   schedule:
     # 北京时间 16:35 = UTC时间 8:35
-    - cron: '35 8 * * *'
+    - cron: '35 8 * * 1-5'
   workflow_dispatch: # 允许手动点击测试
 
 jobs:
@@ -11,10 +11,10 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
-        uses: actions/checkout@v2
+        uses: actions/checkout@v4
 
       - name: Set up Python
-        uses: actions/setup-python@v2
+        uses: actions/setup-python@v4
         with:
           python-version: '3.9'
 

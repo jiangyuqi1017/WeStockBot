@@ -11,6 +11,8 @@ KEYS_STR = os.getenv("SERVERCHAN_KEY", "")
 TARGETS = {
     "美股纳指": {"code": "gb_ixic", "type": "us"},
     "标普500":  {"code": "gb_inx",  "type": "us"},
+    "VIX恐慌指数": {"code": "gb_vix",  "type": "us"},
+    "美债10Y":  {"code": "gb_tnx",  "type": "us"},
     "港股恒指": {"code": "rt_hkHSI", "type": "hk"},
     "美元/人民币": {"code": "fx_susdcny", "type": "fx"},
     "黄金期货": {"code": "hf_GC", "type": "future"},
@@ -76,6 +78,8 @@ def get_sina_data(targets):
                 # 收集标题信息
                 if name == "美股纳指":
                     main_title_info += f"纳指 {sign}{change_pct:.2f}%"
+                if name == "VIX恐慌指数":
+                    main_title_info += f" | VIX {price:.1f}"
                 if name == "美元/人民币":
                     main_title_info += f" | 汇率 {price:.2f}"
                     
