@@ -36,12 +36,22 @@ def get_market_analysis():
         # indicator="今日" 代表获取当天的实时资金流排行
         # 返回列名通常包含：['名称', '今日涨跌幅', '今日主力净流入', '今日超大单净流入'...]
         
-        # 1. 抓取行业数据
-        df_ind = ak.stock_sector_fund_flow_rank(indicator="今日", sector_type="行业资金流")
-        
+        # 1. 抓取行业数据（今日数据收盘后可能短暂为空，fallback 到 5日）
+        try:
+            df_ind = ak.stock_sector_fund_flow_rank(indicator="今日", sector_type="行业资金流")
+            if df_ind is None or df_ind.empty:
+                raise ValueError("empty")
+        except Exception:
+            df_ind = ak.stock_sector_fund_flow_rank(indicator="5日", sector_type="行业资金流")
+
         # 2. 抓取概念数据
-        df_con = ak.stock_sector_fund_flow_rank(indicator="今日", sector_type="概念资金流")
-        
+        try:
+            df_con = ak.stock_sector_fund_flow_rank(indicator="今日", sector_type="概念资金流")
+            if df_con is None or df_con.empty:
+                raise ValueError("empty")
+        except Exception:
+            df_con = ak.stock_sector_fund_flow_rank(indicator="5日", sector_type="概念资金流")
+
         # 3. 确定列名 (防止接口字段微调)
         # 自动寻找包含 "涨跌幅" 和 "主力净流入" 的列
         name_col = next((x for x in df_ind.columns if "名称" in x), "名称")
