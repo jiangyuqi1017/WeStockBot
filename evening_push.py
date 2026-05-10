@@ -36,21 +36,31 @@ def get_market_analysis():
         # indicator="今日" 代表获取当天的实时资金流排行
         # 返回列名通常包含：['名称', '今日涨跌幅', '今日主力净流入', '今日超大单净流入'...]
         
-        # 1. 抓取行业数据（今日数据收盘后可能短暂为空，fallback 到 5日）
-        try:
-            df_ind = ak.stock_sector_fund_flow_rank(indicator="今日", sector_type="行业资金流")
-            if df_ind is None or df_ind.empty:
-                raise ValueError("empty")
-        except Exception:
-            df_ind = ak.stock_sector_fund_flow_rank(indicator="5日", sector_type="行业资金流")
+        # 1. 抓取行业数据（依次尝试今日/5日/10日，非交易日时均为空）
+        df_ind = None
+        for ind in ["今日", "5日", "10日"]:
+            try:
+                df_ind = ak.stock_sector_fund_flow_rank(indicator=ind, sector_type="行业资金流")
+                if df_ind is not None and not df_ind.empty:
+                    break
+                df_ind = None
+            except Exception:
+                df_ind = None
+        if df_ind is None or df_ind.empty:
+            return "A股复盘: 今日无数据", "今日非交易日或数据尚未就绪，无法生成复盘。"
 
         # 2. 抓取概念数据
-        try:
-            df_con = ak.stock_sector_fund_flow_rank(indicator="今日", sector_type="概念资金流")
-            if df_con is None or df_con.empty:
-                raise ValueError("empty")
-        except Exception:
-            df_con = ak.stock_sector_fund_flow_rank(indicator="5日", sector_type="概念资金流")
+        df_con = None
+        for ind in ["今日", "5日", "10日"]:
+            try:
+                df_con = ak.stock_sector_fund_flow_rank(indicator=ind, sector_type="概念资金流")
+                if df_con is not None and not df_con.empty:
+                    break
+                df_con = None
+            except Exception:
+                df_con = None
+        if df_con is None or df_con.empty:
+            df_con = df_ind  # 概念数据缺失时用行业数据代替，至少不崩溃
 
         # 3. 确定列名 (防止接口字段微调)
         # 自动寻找包含 "涨跌幅" 和 "主力净流入" 的列
